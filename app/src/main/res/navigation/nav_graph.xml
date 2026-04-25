@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/remindersFragment">
+
+    <fragment
+        android:id="@+id/remindersFragment"
+        android:name="com.valamas.chimereminder.ui.reminders.RemindersFragment"
+        android:label="@string/app_name"
+        tools:layout="@layout/fragment_reminders">
+
+        <action
+            android:id="@+id/action_reminders_to_addEdit"
+            app:destination="@id/addEditReminderFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/historyFragment"
+        android:name="com.valamas.chimereminder.ui.history.HistoryFragment"
+        android:label="@string/tab_history"
+        tools:layout="@layout/fragment_history" />
+
+    <fragment
+        android:id="@+id/aboutFragment"
+        android:name="com.valamas.chimereminder.ui.about.AboutFragment"
+        android:label=" "
+        tools:layout="@layout/fragment_about" />
+
+    <fragment
+        android:id="@+id/addEditReminderFragment"
+        android:name="com.valamas.chimereminder.ui.reminders.AddEditReminderFragment"
+        android:label="@string/add_reminder"
+        tools:layout="@layout/fragment_add_edit_reminder">
+
+        <argument
+            android:name="reminderId"
+            app:argType="long"
+            android:defaultValue="-1L" />
+
+    </fragment>
+
+</navigation>
