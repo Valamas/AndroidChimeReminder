@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         navController = navHost.navController
 
         appBarConfiguration = AppBarConfiguration(
-            setOf(R.id.remindersFragment, R.id.historyFragment, R.id.aboutFragment)
+            setOf(R.id.remindersFragment, R.id.historyFragment, R.id.aboutFragment, R.id.recordingsFragment)
         )
 
         setSupportActionBar(binding.toolbar)
