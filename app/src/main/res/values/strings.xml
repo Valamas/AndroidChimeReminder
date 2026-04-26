@@ -116,9 +116,5 @@
     <string name="recording_mic_denied">Microphone permission is required to record.</string>
     <string name="recording_timer_format">%s</string>
 
-    <string-array name="sound_categories">
-        <item>@string/sound_category_bundled</item>
-        <item>@string/sound_category_system</item>
-        <item>@string/sound_category_file</item>
-    </string-array>
+    <string name="sound_category_file">Audio file from device</string>
 </resources>
