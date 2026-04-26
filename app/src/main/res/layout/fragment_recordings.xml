@@ -16,18 +16,6 @@
         android:textColor="?attr/colorOnSurfaceVariant"
         android:visibility="gone" />
 
-    <TextView
-        android:id="@+id/proPrompt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:padding="24dp"
-        android:text="@string/recordings_pro_prompt"
-        android:textAppearance="?attr/textAppearanceBodyLarge"
-        android:textColor="?attr/colorPrimary"
-        android:visibility="gone" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recordingsList"
         android:layout_width="match_parent"
@@ -42,7 +30,6 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:contentDescription="@string/recording_record"
-        app:srcCompat="@drawable/ic_mic"
-        android:visibility="gone" />
+        app:srcCompat="@drawable/ic_mic" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

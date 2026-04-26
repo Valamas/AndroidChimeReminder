@@ -73,31 +73,30 @@ class RecordingsFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.recordings.collect { list ->
-                        adapter.submitList(list)
-                        binding.emptyText.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
-                    }
-                }
-                launch {
-                    viewModel.isPro.collect { pro ->
-                        binding.recordFab.visibility = if (pro) View.VISIBLE else View.GONE
-                        binding.proPrompt.visibility = if (pro) View.GONE else View.VISIBLE
-                        binding.emptyText.visibility =
-                            if (!pro || adapter.itemCount > 0) View.GONE else View.VISIBLE
-                    }
+                viewModel.recordings.collect { list ->
+                    adapter.submitList(list)
+                    binding.emptyText.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
                 }
             }
         }
 
         binding.recordFab.setOnClickListener { checkMicAndRecord() }
-
-        binding.proPrompt.setOnClickListener {
-            (requireActivity().application as App).billingManager.launchPurchase(requireActivity())
-        }
     }
 
     private fun checkMicAndRecord() {
+        val isPro = viewModel.isPro.value
+        val count = viewModel.recordings.value.size
+        if (!isPro && count >= 1) {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.pro_upgrade_title)
+                .setMessage(R.string.recording_pro_limit_message)
+                .setPositiveButton(R.string.pro_upgrade_button) { _, _ ->
+                    (requireActivity().application as App).billingManager.launchPurchase(requireActivity())
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+            return
+        }
         if (ContextCompat.checkSelfPermission(
                 requireContext(), Manifest.permission.RECORD_AUDIO
             ) == PackageManager.PERMISSION_GRANTED

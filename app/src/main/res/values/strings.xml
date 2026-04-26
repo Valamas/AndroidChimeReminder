@@ -102,7 +102,7 @@
     <string name="tab_recordings">Recordings</string>
     <string name="sound_category_recordings">My Recordings</string>
     <string name="no_recordings">No recordings yet.\nTap the mic to record.</string>
-    <string name="recordings_pro_prompt">✨ Recordings is a Pro feature.\nTap to unlock.</string>
+    <string name="recording_pro_limit_message">Free tier includes 1 recording.\n\nPro unlocks unlimited recordings — one-time purchase.</string>
     <string name="recording_dialog_title">New Recording</string>
     <string name="recording_record">Record</string>
     <string name="recording_stop">Stop</string>

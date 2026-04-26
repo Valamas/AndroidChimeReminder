@@ -17,7 +17,7 @@ class RecordingsViewModel(app: Application) : AndroidViewModel(app) {
     val recordings: StateFlow<List<UserRecording>> = dao.getAll()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val isPro: StateFlow<Boolean> = app.billingManager.isPro
+    val isPro: StateFlow<Boolean> = (app as App).billingManager.isPro
 
     fun insert(recording: UserRecording) = viewModelScope.launch {
         dao.insert(recording)
