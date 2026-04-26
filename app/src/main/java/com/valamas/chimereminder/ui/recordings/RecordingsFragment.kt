@@ -129,24 +129,6 @@ class RecordingsFragment : Fragment() {
         previewButton.isEnabled = false
         chronometer.text = "0:00"
 
-        recordToggle.setOnClickListener {
-            if (!isRecording) {
-                startRecording()
-                chronometer.base = SystemClock.elapsedRealtime()
-                chronometer.start()
-                recordToggle.text = getString(R.string.recording_stop)
-                recordToggle.setIconResource(R.drawable.ic_stop)
-                previewButton.isEnabled = false
-            } else {
-                recordingDurationMs = System.currentTimeMillis() - recordingStartMs
-                stopRecording()
-                chronometer.stop()
-                recordToggle.text = getString(R.string.recording_record)
-                recordToggle.setIconResource(R.drawable.ic_mic)
-                previewButton.isEnabled = recordingFile != null
-            }
-        }
-
         previewButton.setOnClickListener {
             val file = recordingFile ?: return@setOnClickListener
             stopPreview()
@@ -169,27 +151,36 @@ class RecordingsFragment : Fragment() {
             } catch (_: Exception) { }
         }
 
-        MaterialAlertDialogBuilder(requireContext())
+        var saveDialog: androidx.appcompat.app.AlertDialog? = null
+
+        fun updateSaveButton() {
+            saveDialog?.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)?.isEnabled =
+                recordingFile != null && nameInput.text.toString().isNotBlank()
+        }
+
+        recordToggle.setOnClickListener {
+            if (!isRecording) {
+                startRecording()
+                chronometer.base = SystemClock.elapsedRealtime()
+                chronometer.start()
+                recordToggle.text = getString(R.string.recording_stop)
+                recordToggle.setIconResource(R.drawable.ic_stop)
+                previewButton.isEnabled = false
+            } else {
+                recordingDurationMs = System.currentTimeMillis() - recordingStartMs
+                stopRecording()
+                chronometer.stop()
+                recordToggle.text = getString(R.string.recording_record)
+                recordToggle.setIconResource(R.drawable.ic_mic)
+                previewButton.isEnabled = recordingFile != null
+                updateSaveButton()
+            }
+        }
+
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.recording_dialog_title)
             .setView(dialogView)
-            .setPositiveButton(R.string.save) { _, _ ->
-                stopRecording()
-                stopPreview()
-                val name = nameInput.text.toString().trim()
-                val file = recordingFile
-                if (name.isEmpty() || file == null) {
-                    file?.delete()
-                    recordingFile = null
-                    return@setPositiveButton
-                }
-                val durationMs = recordingDurationMs
-                viewModel.insert(UserRecording(
-                    name = name,
-                    filename = file.name,
-                    durationMs = durationMs
-                ))
-                recordingFile = null
-            }
+            .setPositiveButton(R.string.save, null) // null — we handle click manually to block dismiss
             .setNegativeButton(R.string.recording_discard) { _, _ ->
                 stopRecording()
                 stopPreview()
@@ -203,6 +194,27 @@ class RecordingsFragment : Fragment() {
                 recordingFile = null
             }
             .show()
+
+        saveDialog = dialog
+
+        // Save disabled until recording exists + name entered
+        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).isEnabled = false
+
+        nameInput.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) = updateSaveButton()
+        })
+
+        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            stopRecording()
+            stopPreview()
+            val name = nameInput.text.toString().trim()
+            val file = recordingFile ?: return@setOnClickListener
+            viewModel.insert(UserRecording(name = name, filename = file.name, durationMs = recordingDurationMs))
+            recordingFile = null
+            dialog.dismiss()
+        }
     }
 
     private fun startRecording() {
