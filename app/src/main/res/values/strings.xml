@@ -43,7 +43,8 @@
     <string name="choose_sound">Choose sound</string>
     <string name="choose_bundled_chime">Bundled Chimes</string>
     <string name="select_sound">Select</string>
-    <string name="sound_default">Classic Chime (default)</string>
+    <string name="sound_default">Default (Ripple)</string>
+    <string name="preview_volume_label">Preview volume</string>
     <string name="sound_custom">Custom sound</string>
     <string name="sound_category_bundled">Bundled chimes</string>
     <string name="sound_category_system">System ringtone</string>
@@ -69,7 +70,13 @@
     <string name="exact_alarm_rationale">Exact alarm permission required for reliable chimes. Tap to grant.</string>
 
     <!-- Bundled chime display names (matched by raw resource name) -->
+    <string name="chime_name_default">Default</string>
     <string name="chime_name_classic">Classic</string>
+    <string name="chime_name_cuckoo">Cuckoo</string>
+    <string name="chime_name_doorbell">Doorbell</string>
+    <string name="chime_name_fanfare">Fanfare</string>
+    <string name="chime_name_retro">Retro</string>
+    <string name="chime_name_ripple">Ripple</string>
     <string name="chime_name_bell">Bell</string>
     <string name="chime_name_soft">Soft</string>
     <string name="chime_name_high">High Pitch</string>
@@ -84,6 +91,13 @@
     <string name="chime_name_pulse">Pulse</string>
     <string name="chime_name_warp">Warp</string>
     <string name="chime_name_zap">Zap</string>
+
+    <string name="pro_banner_text">✨ Unlock Pro — unlimited reminders &amp; all chimes</string>
+    <string name="pro_upgrade_title">Upgrade to Pro</string>
+    <string name="pro_upgrade_message">Free tier: up to 3 reminders and the Classic chime.\n\nPro unlocks unlimited reminders, all 15 chimes, and custom sounds — one-time purchase.</string>
+    <string name="pro_upgrade_button">Unlock Pro — $2.99</string>
+    <string name="pro_restore">Restore Purchase</string>
+    <string name="pro_restore_checking">Checking purchases…</string>
 
     <string-array name="sound_categories">
         <item>@string/sound_category_bundled</item>

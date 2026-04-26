@@ -1,5 +1,6 @@
 package com.valamas.chimereminder.viewmodel
 
+import android.app.Activity
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,6 +9,7 @@ import com.valamas.chimereminder.alarm.AlarmScheduler
 import com.valamas.chimereminder.data.Reminder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -17,6 +19,11 @@ class RemindersViewModel(app: Application) : AndroidViewModel(app) {
     private val appScope = (app as App).applicationScope
 
     val reminders: Flow<List<Reminder>> = dao.getAll()
+    val reminderCount: Flow<Int> = dao.getCount()
+    val isPro: StateFlow<Boolean> = (app as App).billingManager.isPro
+
+    fun launchPurchase(activity: Activity) =
+        (getApplication<App>()).billingManager.launchPurchase(activity)
 
     fun saveInBackground(reminder: Reminder) {
         appScope.launch { doSave(reminder) }
@@ -49,7 +56,6 @@ class RemindersViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun toggleEnabled(reminder: Reminder) = viewModelScope.launch {
-        // Always recompute nextTriggerMs so list sort stays correct even when disabled
         val next = AlarmScheduler.computeNextTrigger(reminder)
         val updated = reminder.copy(isEnabled = !reminder.isEnabled, nextTriggerMs = next)
         dao.update(updated)

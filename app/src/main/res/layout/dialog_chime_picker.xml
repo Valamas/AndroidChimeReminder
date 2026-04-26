@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="24dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/preview_volume_label"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/previewVolumeSlider"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:stepSize="1"
+            android:value="7"
+            android:valueFrom="0"
+            android:valueTo="15" />
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/chimeListView"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:choiceMode="singleChoice"
+        android:divider="?attr/dividerHorizontal"
+        android:dividerHeight="0.5dp" />
+
+</LinearLayout>

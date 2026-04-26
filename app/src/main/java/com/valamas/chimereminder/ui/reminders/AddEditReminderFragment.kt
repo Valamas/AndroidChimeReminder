@@ -43,22 +43,28 @@ class AddEditReminderFragment : Fragment() {
 
     private data class BundledChime(val label: String, val resName: String)
 
-    // Alphabetized; Classic (default, empty resName) sorts under C
+    // Default first (= Ripple), rest alphabetical.
     private val bundledChimes = listOf(
-        BundledChime("Bell",       "chime_bell"),
-        BundledChime("Classic",    ""),
-        BundledChime("Deep Bell",  "chime_low"),
-        BundledChime("Descend",    "chime_descend"),
-        BundledChime("Double",     "chime_double"),
+        BundledChime("Default",    "chime_ripple"), // always first
+        BundledChime("Bird",       "chime_bird"),
+        BundledChime("Bird Song",  "chime_birdsong"),
+        BundledChime("Cricket",    "chime_cricket"),
+        BundledChime("Dolphin",    "chime_dolphin"),
+        BundledChime("Doorbell",   "chime_doorbell"),
+        BundledChime("Fire",       "chime_fire"),
+        BundledChime("Geiger",     "chime_geiger"),
         BundledChime("High Pitch", "chime_high"),
+        BundledChime("Horse",      "chime_horse"),
+        BundledChime("Kettle",     "chime_kettle"),
         BundledChime("Laser",      "chime_laser"),
+        BundledChime("Mbira",      "chime_mbira"),
+        BundledChime("Morse",      "chime_morse"),
+        BundledChime("Music Box",  "chime_musicbox"),
         BundledChime("Photon",     "chime_photon"),
-        BundledChime("Ping",       "chime_ping"),
         BundledChime("Pulse",      "chime_pulse"),
-        BundledChime("Soft",       "chime_soft"),
-        BundledChime("Triple",     "chime_triple"),
-        BundledChime("Warm",       "chime_warm"),
-        BundledChime("Warp",       "chime_warp"),
+        BundledChime("Radar",      "chime_radar"),
+        BundledChime("Retro",      "chime_retro"),
+        BundledChime("Water Drip", "chime_drip"),
         BundledChime("Zap",        "chime_zap"),
     )
 
@@ -67,10 +73,13 @@ class AddEditReminderFragment : Fragment() {
     private val viewModel: RemindersViewModel by viewModels()
     private val args: AddEditReminderFragmentArgs by navArgs()
     private var editingReminder: Reminder? = null
-    private var selectedSoundUri: String = ""
-    private var selectedSoundLabel: String = ""
+    private var selectedSoundUri: String = "raw:chime_ripple"
+    private var selectedSoundLabel: String = "Default"
     private var previewPlayer: MediaPlayer? = null
     private var isCountdownMode = false
+
+    private val isPro get() =
+        (requireActivity().application as App).billingManager.isPro.value
 
     private var isDirty = false
     private var isLoading = true
@@ -411,7 +420,7 @@ class AddEditReminderFragment : Fragment() {
             .setItems(categories) { _, which ->
                 when (which) {
                     0 -> showBundledChimePicker()
-                    1 -> ringtonePicker.launch(
+                    1 -> if (isPro) ringtonePicker.launch(
                         Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
                             putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, false)
                             putExtra(
@@ -419,15 +428,31 @@ class AddEditReminderFragment : Fragment() {
                                 RingtoneManager.TYPE_ALARM or RingtoneManager.TYPE_NOTIFICATION
                             )
                         }
-                    )
-                    2 -> pickAudioFile()
+                    ) else showSoundUpgradeDialog()
+                    2 -> if (isPro) pickAudioFile() else showSoundUpgradeDialog()
                 }
             }
             .show()
     }
 
+    private fun showSoundUpgradeDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.pro_upgrade_title)
+            .setMessage(R.string.pro_upgrade_message)
+            .setPositiveButton(R.string.pro_upgrade_button) { _, _ ->
+                (requireActivity().application as App).billingManager.launchPurchase(requireActivity())
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
     private fun showBundledChimePicker() {
-        val names = bundledChimes.map { it.label }.toTypedArray()
+        val proUser = isPro
+        val names = bundledChimes.map { chime ->
+            if (!proUser && chime.resName.isNotEmpty() && chime.resName != "chime_ripple") "${chime.label} \uD83D\uDD12"
+            else chime.label
+        }.toTypedArray()
+
         val initialIndex = bundledChimes.indexOfFirst { chime ->
             if (chime.resName.isEmpty()) selectedSoundUri.isEmpty()
             else selectedSoundUri == "raw:${chime.resName}"
@@ -435,15 +460,37 @@ class AddEditReminderFragment : Fragment() {
 
         var pendingIndex = initialIndex
 
+        val dialogView = layoutInflater.inflate(R.layout.dialog_chime_picker, null)
+        val previewSlider = dialogView.findViewById<Slider>(R.id.previewVolumeSlider)
+        val listView = dialogView.findViewById<android.widget.ListView>(R.id.chimeListView)
+
+        var previewVolume = 7
+        previewSlider.value = previewVolume.toFloat()
+        previewSlider.addOnChangeListener { _, value, _ -> previewVolume = value.toInt() }
+
+        listView.choiceMode = android.widget.ListView.CHOICE_MODE_SINGLE
+        listView.adapter = android.widget.ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_list_item_single_choice,
+            names
+        )
+        listView.setItemChecked(initialIndex, true)
+        listView.setOnItemClickListener { _, _, which, _ ->
+            pendingIndex = which
+            previewChime(bundledChimes[which], previewVolume)
+        }
+
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.choose_bundled_chime)
-            .setSingleChoiceItems(names, initialIndex) { _, which ->
-                pendingIndex = which
-                previewChime(bundledChimes[which])
-            }
+            .setView(dialogView)
             .setPositiveButton(R.string.select_sound) { _, _ ->
                 stopPreview()
                 val chime = bundledChimes[pendingIndex]
+                val locked = !proUser && chime.resName.isNotEmpty() && chime.resName != "chime_ripple"
+                if (locked) {
+                    showSoundUpgradeDialog()
+                    return@setPositiveButton
+                }
                 selectedSoundUri = if (chime.resName.isEmpty()) "" else "raw:${chime.resName}"
                 selectedSoundLabel = chime.label
                 markDirty()
@@ -501,24 +548,38 @@ class AddEditReminderFragment : Fragment() {
         }
     }
 
-    private fun previewChime(chime: BundledChime) {
+    private fun previewChime(chime: BundledChime, volumeLevel: Int = 7) {
         stopPreview()
         val resName = chime.resName.ifEmpty { "chime" }
         val resId = requireContext().resources
             .getIdentifier(resName, "raw", requireContext().packageName)
         if (resId == 0) return
 
-        // Use USAGE_ALARM so preview plays at alarm volume regardless of media volume
-        val audioAttrs = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_ALARM)
-            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-            .build()
+        val ctx = requireContext()
+        val audioManager = ctx.getSystemService(AudioManager::class.java)
+        val maxAlarmVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM)
+        val savedVol = audioManager.getStreamVolume(AudioManager.STREAM_ALARM)
+        val targetVol = (volumeLevel * maxAlarmVol / 15).coerceIn(0, maxAlarmVol)
+        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, targetVol, 0)
 
         previewPlayer = MediaPlayer().apply {
-            setAudioAttributes(audioAttrs)
-            val uri = Uri.parse("android.resource://${requireContext().packageName}/$resId")
-            setDataSource(requireContext(), uri)
-            setOnCompletionListener { it.release(); previewPlayer = null }
+            setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+            )
+            val uri = Uri.parse("android.resource://${ctx.packageName}/$resId")
+            setDataSource(ctx, uri)
+            setOnCompletionListener {
+                it.release()
+                previewPlayer = null
+                audioManager.setStreamVolume(AudioManager.STREAM_ALARM, savedVol, 0)
+            }
+            setOnErrorListener { _, _, _ ->
+                audioManager.setStreamVolume(AudioManager.STREAM_ALARM, savedVol, 0)
+                true
+            }
             prepare()
             start()
         }
@@ -550,6 +611,8 @@ class AddEditReminderFragment : Fragment() {
     private fun updateSoundButton() {
         binding.soundButton.text = when {
             selectedSoundUri.isEmpty() -> getString(R.string.sound_default)
+            selectedSoundUri == "raw:chime_ripple" && selectedSoundLabel == "Default" ->
+                getString(R.string.sound_default)
             selectedSoundLabel.isNotEmpty() -> selectedSoundLabel
             else -> getString(R.string.sound_custom)
         }

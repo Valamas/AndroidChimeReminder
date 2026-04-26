@@ -12,16 +12,61 @@ import androidx.recyclerview.widget.RecyclerView
 import com.valamas.chimereminder.R
 import com.valamas.chimereminder.data.Reminder
 import com.valamas.chimereminder.data.RepeatType
+import com.valamas.chimereminder.databinding.ItemProBannerBinding
 import com.valamas.chimereminder.databinding.ItemReminderBinding
 import java.util.Locale
 
 class RemindersAdapter(
     private val onToggle: (Reminder) -> Unit,
     private val onClick: (Reminder) -> Unit,
-    private val onLongClick: (Reminder) -> Unit
-) : ListAdapter<Reminder, RemindersAdapter.ViewHolder>(DiffCallback) {
+    private val onLongClick: (Reminder) -> Unit,
+    private val onUpgradeClick: () -> Unit
+) : ListAdapter<Reminder, RecyclerView.ViewHolder>(DiffCallback) {
 
-    inner class ViewHolder(private val binding: ItemReminderBinding) :
+    private var showBanner = false
+
+    fun setBannerVisible(show: Boolean) {
+        if (showBanner == show) return
+        val bannerPosition = currentList.size
+        showBanner = show
+        if (show) notifyItemInserted(bannerPosition)
+        else notifyItemRemoved(bannerPosition)
+    }
+
+    override fun getItemCount() = super.getItemCount() + if (showBanner) 1 else 0
+
+    override fun getItemViewType(position: Int) =
+        if (showBanner && position == currentList.size) TYPE_PRO_BANNER else TYPE_REMINDER
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        return if (viewType == TYPE_PRO_BANNER) {
+            BannerViewHolder(ItemProBannerBinding.inflate(inflater, parent, false))
+        } else {
+            ReminderViewHolder(ItemReminderBinding.inflate(inflater, parent, false))
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (holder) {
+            is ReminderViewHolder -> holder.bind(getItem(position))
+            is BannerViewHolder -> holder.bind()
+        }
+    }
+
+    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+        super.onViewRecycled(holder)
+        if (holder is ReminderViewHolder) holder.cancelTick()
+    }
+
+    inner class BannerViewHolder(private val binding: ItemProBannerBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind() {
+            binding.root.setOnClickListener { onUpgradeClick() }
+        }
+    }
+
+    inner class ReminderViewHolder(private val binding: ItemReminderBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         private val handler = Handler(Looper.getMainLooper())
@@ -118,18 +163,10 @@ class RemindersAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        ViewHolder(ItemReminderBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) =
-        holder.bind(getItem(position))
-
-    override fun onViewRecycled(holder: ViewHolder) {
-        super.onViewRecycled(holder)
-        holder.cancelTick()
-    }
-
     companion object DiffCallback : DiffUtil.ItemCallback<Reminder>() {
+        private const val TYPE_REMINDER = 0
+        private const val TYPE_PRO_BANNER = 1
+
         override fun areItemsTheSame(a: Reminder, b: Reminder) = a.id == b.id
         override fun areContentsTheSame(a: Reminder, b: Reminder) = a == b
     }

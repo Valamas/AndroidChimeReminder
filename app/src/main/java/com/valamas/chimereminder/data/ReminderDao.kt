@@ -28,4 +28,7 @@ interface ReminderDao {
 
     @Delete
     suspend fun delete(reminder: Reminder)
+
+    @Query("SELECT COUNT(*) FROM reminders")
+    fun getCount(): Flow<Int>
 }

@@ -27,6 +27,9 @@ class RemindersFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: RemindersViewModel by viewModels()
 
+    private var currentCount = 0
+    private val freeLimit = 3
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,21 +40,6 @@ class RemindersFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        requireActivity().addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
-                inflater.inflate(R.menu.menu_reminders, menu)
-            }
-            override fun onMenuItemSelected(item: MenuItem): Boolean {
-                if (item.itemId == R.id.action_add_reminder) {
-                    findNavController().navigate(
-                        RemindersFragmentDirections.actionRemindersToAddEdit(-1L)
-                    )
-                    return true
-                }
-                return false
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
         val adapter = RemindersAdapter(
             onToggle = { reminder -> viewModel.toggleEnabled(reminder) },
@@ -67,21 +55,64 @@ class RemindersFragment : Fragment() {
                     .setPositiveButton(R.string.delete) { _, _ -> viewModel.delete(reminder) }
                     .setNegativeButton(android.R.string.cancel, null)
                     .show()
-            }
+            },
+            onUpgradeClick = { showUpgradeDialog() }
         )
 
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.adapter = adapter
 
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
+                inflater.inflate(R.menu.menu_reminders, menu)
+            }
+            override fun onMenuItemSelected(item: MenuItem): Boolean {
+                if (item.itemId == R.id.action_add_reminder) {
+                    if (!viewModel.isPro.value && currentCount >= freeLimit) {
+                        showUpgradeDialog()
+                    } else {
+                        findNavController().navigate(
+                            RemindersFragmentDirections.actionRemindersToAddEdit(-1L)
+                        )
+                    }
+                    return true
+                }
+                return false
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.reminders.collect { list ->
-                    adapter.submitList(list)
-                    binding.emptyText.visibility =
-                        if (list.isEmpty()) View.VISIBLE else View.GONE
+                launch {
+                    viewModel.reminders.collect { list ->
+                        adapter.submitList(list)
+                        binding.emptyText.visibility =
+                            if (list.isEmpty()) View.VISIBLE else View.GONE
+                    }
+                }
+                launch {
+                    viewModel.reminderCount.collect { count ->
+                        currentCount = count
+                    }
+                }
+                launch {
+                    viewModel.isPro.collect { isPro ->
+                        adapter.setBannerVisible(!isPro)
+                    }
                 }
             }
         }
+    }
+
+    private fun showUpgradeDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.pro_upgrade_title)
+            .setMessage(R.string.pro_upgrade_message)
+            .setPositiveButton(R.string.pro_upgrade_button) { _, _ ->
+                viewModel.launchPurchase(requireActivity())
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 
     override fun onDestroyView() {
