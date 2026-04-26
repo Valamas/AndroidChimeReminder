@@ -415,7 +415,6 @@ class AddEditReminderFragment : Fragment() {
         val categories = arrayOf(
             getString(R.string.sound_category_bundled),
             getString(R.string.sound_category_system),
-            getString(R.string.sound_category_file),
             getString(R.string.sound_category_recordings)
         )
         MaterialAlertDialogBuilder(requireContext())
@@ -432,8 +431,7 @@ class AddEditReminderFragment : Fragment() {
                             )
                         }
                     ) else showSoundUpgradeDialog()
-                    2 -> if (isPro) pickAudioFile() else showSoundUpgradeDialog()
-                    3 -> showRecordingsPicker()
+                    2 -> showRecordingsPicker()
                 }
             }
             .show()
@@ -450,17 +448,82 @@ class AddEditReminderFragment : Fragment() {
                     .show()
                 return@launch
             }
+
+            val initialIndex = recordings.indexOfFirst {
+                selectedSoundUri == "recording:${it.filename}"
+            }.coerceAtLeast(0)
+
+            var pendingIndex = initialIndex
+
+            val dialogView = layoutInflater.inflate(R.layout.dialog_chime_picker, null)
+            val previewSlider = dialogView.findViewById<Slider>(R.id.previewVolumeSlider)
+            val listView = dialogView.findViewById<android.widget.ListView>(R.id.chimeListView)
+
+            var previewVolume = 7
+            previewSlider.value = previewVolume.toFloat()
+            previewSlider.addOnChangeListener { _, value, _ -> previewVolume = value.toInt() }
+
             val names = recordings.map { it.name }.toTypedArray()
+            listView.choiceMode = android.widget.ListView.CHOICE_MODE_SINGLE
+            listView.adapter = android.widget.ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_list_item_single_choice,
+                names
+            )
+            listView.setItemChecked(initialIndex, true)
+            listView.setOnItemClickListener { _, _, which, _ ->
+                pendingIndex = which
+                previewRecording(recordings[which], previewVolume)
+            }
+
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.sound_category_recordings)
-                .setItems(names) { _, which ->
-                    val rec = recordings[which]
+                .setView(dialogView)
+                .setPositiveButton(R.string.select_sound) { _, _ ->
+                    stopPreview()
+                    val rec = recordings[pendingIndex]
                     selectedSoundUri = "recording:${rec.filename}"
                     selectedSoundLabel = rec.name
                     markDirty()
                     updateSoundButton()
                 }
+                .setNegativeButton(android.R.string.cancel) { _, _ -> stopPreview() }
+                .setOnDismissListener { stopPreview() }
                 .show()
+        }
+    }
+
+    private fun previewRecording(recording: com.valamas.chimereminder.data.UserRecording, volumeLevel: Int = 7) {
+        stopPreview()
+        val file = File(requireContext().filesDir, "recordings/${recording.filename}")
+        if (!file.exists()) return
+
+        val ctx = requireContext()
+        val audioManager = ctx.getSystemService(AudioManager::class.java)
+        val maxAlarmVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM)
+        val savedVol = audioManager.getStreamVolume(AudioManager.STREAM_ALARM)
+        val targetVol = (volumeLevel * maxAlarmVol / 15).coerceIn(0, maxAlarmVol)
+        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, targetVol, 0)
+
+        previewPlayer = MediaPlayer().apply {
+            setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+            )
+            setDataSource(file.absolutePath)
+            setOnCompletionListener {
+                it.release()
+                previewPlayer = null
+                audioManager.setStreamVolume(AudioManager.STREAM_ALARM, savedVol, 0)
+            }
+            setOnErrorListener { _, _, _ ->
+                audioManager.setStreamVolume(AudioManager.STREAM_ALARM, savedVol, 0)
+                true
+            }
+            prepare()
+            start()
         }
     }
 

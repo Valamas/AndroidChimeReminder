@@ -46,9 +46,9 @@
     <string name="sound_default">Default (Ripple)</string>
     <string name="preview_volume_label">Preview volume</string>
     <string name="sound_custom">Custom sound</string>
-    <string name="sound_category_bundled">Bundled chimes</string>
-    <string name="sound_category_system">System ringtone</string>
-    <string name="sound_category_file">Audio file from device</string>
+    <string name="sound_category_bundled">Bundled Chimes — Pro unlocks all</string>
+    <string name="sound_category_system">Phone Ringtones — Pro required</string>
+    <string name="sound_category_recordings">My Recordings — 1 free, Pro for unlimited</string>
     <string name="mode_clock">Clock Time</string>
     <string name="mode_countdown">Countdown</string>
     <string name="countdown_label">Remind me in</string>
@@ -92,15 +92,14 @@
     <string name="chime_name_warp">Warp</string>
     <string name="chime_name_zap">Zap</string>
 
-    <string name="pro_banner_text">✨ Unlock Pro — unlimited reminders &amp; all chimes</string>
+    <string name="pro_banner_text">✨ 3 free reminders — Unlock Pro for unlimited</string>
     <string name="pro_upgrade_title">Upgrade to Pro</string>
-    <string name="pro_upgrade_message">Free tier: up to 3 reminders and the Classic chime.\n\nPro unlocks unlimited reminders, all 15 chimes, and custom sounds — one-time purchase.</string>
+    <string name="pro_upgrade_message">Free tier: up to 3 reminders and the Default chime.\n\nPro unlocks unlimited reminders, all chimes, and voice recordings — one-time purchase.</string>
     <string name="pro_upgrade_button">Unlock Pro — $2.99</string>
     <string name="pro_restore">Restore Purchase</string>
     <string name="pro_restore_checking">Checking purchases…</string>
 
     <string name="tab_recordings">Recordings</string>
-    <string name="sound_category_recordings">My Recordings</string>
     <string name="no_recordings">No recordings yet.\nTap the mic to record.</string>
     <string name="recording_pro_limit_message">Free tier includes 1 recording.\n\nPro unlocks unlimited recordings — one-time purchase.</string>
     <string name="pro_banner_recordings_text">✨ 1 free recording included — Unlock Pro for unlimited</string>
