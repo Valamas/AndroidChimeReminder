@@ -16,4 +16,9 @@
         android:icon="@drawable/ic_about"
         android:title="@string/tab_about" />
 
+    <item
+        android:id="@+id/recordingsFragment"
+        android:icon="@drawable/ic_mic"
+        android:title="@string/tab_recordings" />
+
 </menu>

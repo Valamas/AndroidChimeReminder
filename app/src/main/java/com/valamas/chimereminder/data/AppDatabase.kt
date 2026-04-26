@@ -9,8 +9,8 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [Reminder::class, ReminderLog::class],
-    version = 3,
+    entities = [Reminder::class, ReminderLog::class, UserRecording::class],
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -18,6 +18,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun reminderDao(): ReminderDao
     abstract fun reminderLogDao(): ReminderLogDao
+    abstract fun recordingDao(): RecordingDao
 
     companion object {
         @Volatile
@@ -39,6 +40,20 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    """CREATE TABLE IF NOT EXISTS recordings (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        name TEXT NOT NULL,
+                        filename TEXT NOT NULL,
+                        durationMs INTEGER NOT NULL DEFAULT 0,
+                        createdAt INTEGER NOT NULL
+                    )"""
+                )
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase =
             INSTANCE ?: synchronized(this) {
                 Room.databaseBuilder(
@@ -46,7 +61,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "chime_db"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                     .build()
                     .also { INSTANCE = it }
             }

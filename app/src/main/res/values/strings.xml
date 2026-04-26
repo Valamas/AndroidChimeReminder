@@ -99,6 +99,23 @@
     <string name="pro_restore">Restore Purchase</string>
     <string name="pro_restore_checking">Checking purchases…</string>
 
+    <string name="tab_recordings">Recordings</string>
+    <string name="sound_category_recordings">My Recordings</string>
+    <string name="no_recordings">No recordings yet.\nTap the mic to record.</string>
+    <string name="recordings_pro_prompt">✨ Recordings is a Pro feature.\nTap to unlock.</string>
+    <string name="recording_dialog_title">New Recording</string>
+    <string name="recording_record">Record</string>
+    <string name="recording_stop">Stop</string>
+    <string name="recording_preview">Preview</string>
+    <string name="recording_discard">Discard</string>
+    <string name="recording_name_hint">Name this recording (e.g. Take Pills)</string>
+    <string name="recording_play">Play</string>
+    <string name="recording_in_use">Used by %d reminder(s). Delete anyway?</string>
+    <string name="recording_delete_confirm">Delete this recording?</string>
+    <string name="recording_file_missing">Recording file not found.</string>
+    <string name="recording_mic_denied">Microphone permission is required to record.</string>
+    <string name="recording_timer_format">%s</string>
+
     <string-array name="sound_categories">
         <item>@string/sound_category_bundled</item>
         <item>@string/sound_category_system</item>

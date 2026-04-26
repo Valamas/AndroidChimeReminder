@@ -36,7 +36,9 @@ import com.valamas.chimereminder.data.Reminder
 import com.valamas.chimereminder.data.RepeatType
 import com.valamas.chimereminder.databinding.FragmentAddEditReminderBinding
 import com.valamas.chimereminder.viewmodel.RemindersViewModel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.Calendar
 
 class AddEditReminderFragment : Fragment() {
@@ -413,7 +415,8 @@ class AddEditReminderFragment : Fragment() {
         val categories = arrayOf(
             getString(R.string.sound_category_bundled),
             getString(R.string.sound_category_system),
-            getString(R.string.sound_category_file)
+            getString(R.string.sound_category_file),
+            getString(R.string.sound_category_recordings)
         )
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.choose_sound)
@@ -430,9 +433,35 @@ class AddEditReminderFragment : Fragment() {
                         }
                     ) else showSoundUpgradeDialog()
                     2 -> if (isPro) pickAudioFile() else showSoundUpgradeDialog()
+                    3 -> if (isPro) showRecordingsPicker() else showSoundUpgradeDialog()
                 }
             }
             .show()
+    }
+
+    private fun showRecordingsPicker() {
+        val dao = (requireActivity().application as App).database.recordingDao()
+        lifecycleScope.launch {
+            val recordings = dao.getAll().first()
+            if (recordings.isEmpty()) {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setMessage(R.string.no_recordings)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show()
+                return@launch
+            }
+            val names = recordings.map { it.name }.toTypedArray()
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.sound_category_recordings)
+                .setItems(names) { _, which ->
+                    val rec = recordings[which]
+                    selectedSoundUri = "recording:${rec.filename}"
+                    selectedSoundLabel = rec.name
+                    markDirty()
+                    updateSoundButton()
+                }
+                .show()
+        }
     }
 
     private fun showSoundUpgradeDialog() {
@@ -510,7 +539,7 @@ class AddEditReminderFragment : Fragment() {
         val targetVol = (volumeLevel * maxAlarmVol / 15).coerceIn(0, maxAlarmVol)
         audioManager.setStreamVolume(AudioManager.STREAM_ALARM, targetVol, 0)
 
-        val uri: Uri = when {
+        val uri: Uri? = when {
             selectedSoundUri.isEmpty() ->
                 Uri.parse("android.resource://${ctx.packageName}/${R.raw.chime}")
             selectedSoundUri.startsWith("raw:") -> {
@@ -519,8 +548,14 @@ class AddEditReminderFragment : Fragment() {
                 val id = if (resId != 0) resId else R.raw.chime
                 Uri.parse("android.resource://${ctx.packageName}/$id")
             }
+            selectedSoundUri.startsWith("recording:") -> {
+                val filename = selectedSoundUri.removePrefix("recording:")
+                val file = java.io.File(ctx.filesDir, "recordings/$filename")
+                if (file.exists()) Uri.fromFile(file) else null
+            }
             else -> Uri.parse(selectedSoundUri)
         }
+        if (uri == null) return
 
         try {
             previewPlayer = MediaPlayer().apply {

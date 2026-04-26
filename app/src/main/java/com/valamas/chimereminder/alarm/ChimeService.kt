@@ -100,6 +100,12 @@ class ChimeService : Service() {
                 if (resId != 0) Uri.parse("android.resource://$packageName/$resId")
                 else Uri.parse("android.resource://$packageName/${R.raw.chime}")
             }
+            reminder.soundUri.startsWith("recording:") -> {
+                val filename = reminder.soundUri.removePrefix("recording:")
+                val file = java.io.File(filesDir, "recordings/$filename")
+                if (file.exists()) Uri.fromFile(file)
+                else Uri.parse("android.resource://$packageName/${R.raw.chime}")
+            }
             else -> Uri.parse(reminder.soundUri)
         }
 

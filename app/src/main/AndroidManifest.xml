@@ -20,6 +20,9 @@
 
     <!-- Custom audio file access -->
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+
+    <!-- Voice recordings -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
