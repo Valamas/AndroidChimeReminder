@@ -54,6 +54,13 @@
             android:layout_marginTop="24dp"
             android:text="@string/pro_restore" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/privacyPolicyButton"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/privacy_policy" />
+
         <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/debugProSwitch"
             android:layout_width="wrap_content"
