@@ -275,14 +275,17 @@ class RecordingsFragment : Fragment() {
     private fun confirmDelete(recording: UserRecording) {
         viewLifecycleOwner.lifecycleScope.launch {
             val count = viewModel.usageCount(recording)
-            val message = if (count > 0)
-                getString(R.string.recording_in_use, count)
-            else
-                getString(R.string.recording_delete_confirm)
-
+            if (count > 0) {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.recording_in_use_title)
+                    .setMessage(getString(R.string.recording_in_use_blocked, count))
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show()
+                return@launch
+            }
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.delete)
-                .setMessage(message)
+                .setMessage(R.string.recording_delete_confirm)
                 .setPositiveButton(R.string.delete) { _, _ ->
                     val file = File(requireContext().filesDir, "recordings/${recording.filename}")
                     file.delete()

@@ -110,7 +110,8 @@
     <string name="recording_discard">Discard</string>
     <string name="recording_name_hint">Name this recording (e.g. Take Pills)</string>
     <string name="recording_play">Play</string>
-    <string name="recording_in_use">Used by %d reminder(s). Delete anyway?</string>
+    <string name="recording_in_use_title">Cannot Delete</string>
+    <string name="recording_in_use_blocked">This recording is used by %d reminder(s). Remove it from those reminders first.</string>
     <string name="recording_delete_confirm">Delete this recording?</string>
     <string name="recording_file_missing">Recording file not found.</string>
     <string name="recording_mic_denied">Microphone permission is required to record.</string>
