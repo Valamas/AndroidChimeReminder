@@ -433,7 +433,7 @@ class AddEditReminderFragment : Fragment() {
                         }
                     ) else showSoundUpgradeDialog()
                     2 -> if (isPro) pickAudioFile() else showSoundUpgradeDialog()
-                    3 -> if (isPro) showRecordingsPicker() else showSoundUpgradeDialog()
+                    3 -> showRecordingsPicker()
                 }
             }
             .show()
