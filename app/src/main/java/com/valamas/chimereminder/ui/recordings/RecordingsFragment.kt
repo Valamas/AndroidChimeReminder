@@ -73,11 +73,22 @@ class RecordingsFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.recordings.collect { list ->
-                    adapter.submitList(list)
-                    binding.emptyText.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
+                launch {
+                    viewModel.recordings.collect { list ->
+                        adapter.submitList(list)
+                        binding.emptyText.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
+                    }
+                }
+                launch {
+                    viewModel.isPro.collect { pro ->
+                        binding.proBanner.visibility = if (pro) View.GONE else View.VISIBLE
+                    }
                 }
             }
+        }
+
+        binding.proBanner.setOnClickListener {
+            (requireActivity().application as App).billingManager.launchPurchase(requireActivity())
         }
 
         binding.recordFab.setOnClickListener { checkMicAndRecord() }
