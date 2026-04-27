@@ -10,7 +10,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.valamas.chimereminder"
+        applicationId = "com.valamas.reminders"
         minSdk = 21
         targetSdk = 35
         versionCode = 1
