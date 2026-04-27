@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/remindersFragment"
-        android:name="com.valamas.chimereminder.ui.reminders.RemindersFragment"
+        android:name="com.valamas.reminders.ui.reminders.RemindersFragment"
         android:label="@string/app_name"
         tools:layout="@layout/fragment_reminders">
 
@@ -23,25 +23,25 @@
 
     <fragment
         android:id="@+id/historyFragment"
-        android:name="com.valamas.chimereminder.ui.history.HistoryFragment"
+        android:name="com.valamas.reminders.ui.history.HistoryFragment"
         android:label="@string/tab_history"
         tools:layout="@layout/fragment_history" />
 
     <fragment
         android:id="@+id/aboutFragment"
-        android:name="com.valamas.chimereminder.ui.about.AboutFragment"
+        android:name="com.valamas.reminders.ui.about.AboutFragment"
         android:label=" "
         tools:layout="@layout/fragment_about" />
 
     <fragment
         android:id="@+id/recordingsFragment"
-        android:name="com.valamas.chimereminder.ui.recordings.RecordingsFragment"
+        android:name="com.valamas.reminders.ui.recordings.RecordingsFragment"
         android:label="@string/tab_recordings"
         tools:layout="@layout/fragment_recordings" />
 
     <fragment
         android:id="@+id/addEditReminderFragment"
-        android:name="com.valamas.chimereminder.ui.reminders.AddEditReminderFragment"
+        android:name="com.valamas.reminders.ui.reminders.AddEditReminderFragment"
         android:label="@string/add_reminder"
         tools:layout="@layout/fragment_add_edit_reminder">
 
