@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class BillingManager private constructor(app: Application) : PurchasesUpdatedListener {
 
-    private val _isPro = MutableStateFlow<Boolean>(BuildConfig.DEBUG)
+    private val _isPro = MutableStateFlow<Boolean>(false)
     val isPro: StateFlow<Boolean> = _isPro.asStateFlow()
 
     private val billingClient = BillingClient.newBuilder(app)
