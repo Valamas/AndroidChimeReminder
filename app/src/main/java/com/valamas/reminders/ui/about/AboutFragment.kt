@@ -29,6 +29,9 @@ class AboutFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Show version number
+        binding.versionText.text = "Version ${BuildConfig.VERSION_NAME}"
+
         binding.privacyPolicyButton.setOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.privacy_policy_url))))
         }

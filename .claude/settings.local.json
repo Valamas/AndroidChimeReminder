@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python generate_chime.py)"
+      "Bash(python generate_chime.py)",
+      "Bash(rm -f '_DOCS\" && mv D:PROJECTSAndroidChimeReminderfeature-graphic-final.html D:PROJECTSAndroidChimeReminder_DOCS\"' '_DOCS\" && mv D:PROJECTSAndroidChimeReminderfont-selector.html D:PROJECTSAndroidChimeReminder_DOCS\"')",
+      "Bash(mv feature-graphic-mockups.html feature-graphic-final.html feature-graphic-simple.html font-selector.html _DOCS/)"
     ]
   }
 }

@@ -6,15 +6,15 @@ plugins {
 }
 
 android {
-    namespace = "com.valamas.chimereminder"
+    namespace = "com.valamas.reminders"
     compileSdk = 35
 
     defaultConfig {
         applicationId = "com.valamas.reminders"
         minSdk = 21
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 5
+        versionName = "1.05"
     }
 
     buildTypes {
