@@ -17,8 +17,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.TextView
+import android.widget.SimpleAdapter
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -414,24 +413,28 @@ class AddEditReminderFragment : Fragment() {
     // ── Sound picker ──────────────────────────────────────────────────────────
 
     private fun showSoundPicker() {
-        val categories = listOf(
-            SoundCategory(getString(R.string.sound_category_bundled), if (isPro) "" else getString(R.string.sound_category_bundled_desc)),
-            SoundCategory(getString(R.string.sound_category_system), if (isPro) "" else getString(R.string.sound_category_system_desc)),
-            SoundCategory(getString(R.string.sound_category_recordings), if (isPro) "" else getString(R.string.sound_category_recordings_desc))
+        val data = listOf(
+            mapOf(
+                "title" to getString(R.string.sound_category_bundled),
+                "desc" to if (isPro) "" else getString(R.string.sound_category_bundled_desc)
+            ),
+            mapOf(
+                "title" to getString(R.string.sound_category_system),
+                "desc" to if (isPro) "" else getString(R.string.sound_category_system_desc)
+            ),
+            mapOf(
+                "title" to getString(R.string.sound_category_recordings),
+                "desc" to if (isPro) "" else getString(R.string.sound_category_recordings_desc)
+            )
         )
 
-        val adapter = object : ArrayAdapter<SoundCategory>(requireContext(), R.layout.item_sound_category, categories) {
-            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-                val view = super.getView(position, convertView, parent)
-                val titleView = view.findViewById<TextView>(R.id.categoryTitle)
-                val descView = view.findViewById<TextView>(R.id.categoryDescription)
-                val category = categories[position]
-                titleView.text = category.title
-                descView.text = category.description
-                descView.visibility = if (category.description.isEmpty()) View.GONE else View.VISIBLE
-                return view
-            }
-        }
+        val adapter = SimpleAdapter(
+            requireContext(),
+            data,
+            android.R.layout.simple_list_item_2,
+            arrayOf("title", "desc"),
+            intArrayOf(android.R.id.text1, android.R.id.text2)
+        )
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.choose_sound)
@@ -452,8 +455,6 @@ class AddEditReminderFragment : Fragment() {
             }
             .show()
     }
-
-    private data class SoundCategory(val title: String, val description: String)
 
     private fun showRecordingsPicker() {
         val dao = (requireActivity().application as App).database.recordingDao()
