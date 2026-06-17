@@ -8,7 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.valamas.reminders.App
+import kotlinx.coroutines.launch
 import com.valamas.reminders.BuildConfig
 import com.valamas.reminders.R
 import com.valamas.reminders.databinding.FragmentAboutBinding
@@ -47,6 +49,11 @@ class AboutFragment : Fragment() {
             binding.debugProSwitch.isChecked = billing.isPro.value
             binding.debugProSwitch.setOnCheckedChangeListener { _, checked ->
                 billing.debugSetPro(checked)
+            }
+            viewLifecycleOwner.lifecycleScope.launch {
+                billing.isPro.collect { isPro ->
+                    binding.debugProSwitch.isChecked = isPro
+                }
             }
         }
     }
