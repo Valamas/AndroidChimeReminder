@@ -747,10 +747,12 @@ class AddEditReminderFragment : Fragment() {
         val text = if (subtitle != null) "$title\n$subtitle" else title
         val span = SpannableString(text)
 
+        span.setSpan(RelativeSizeSpan(1.15f), 0, title.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+
         if (subtitle != null) {
             val subtitleStart = title.length + 1
-            val subtitleColor = requireContext().getColor(android.R.color.darker_gray)
-            span.setSpan(RelativeSizeSpan(0.75f), subtitleStart, text.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+            val subtitleColor = requireContext().getColor(android.R.color.black)
+            span.setSpan(RelativeSizeSpan(0.95f), subtitleStart, text.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
             span.setSpan(ForegroundColorSpan(subtitleColor), subtitleStart, text.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
 
