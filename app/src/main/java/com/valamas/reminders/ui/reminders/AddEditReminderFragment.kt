@@ -413,9 +413,9 @@ class AddEditReminderFragment : Fragment() {
 
     private fun showSoundPicker() {
         val categories = arrayOf(
-            getString(R.string.sound_category_bundled),
-            getString(R.string.sound_category_system),
-            getString(R.string.sound_category_recordings)
+            if (isPro) getString(R.string.sound_category_bundled_pro) else getString(R.string.sound_category_bundled),
+            if (isPro) getString(R.string.sound_category_system_pro) else getString(R.string.sound_category_system),
+            if (isPro) getString(R.string.sound_category_recordings_pro) else getString(R.string.sound_category_recordings)
         )
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.choose_sound)

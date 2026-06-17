@@ -49,8 +49,11 @@
     <string name="preview_volume_label">Preview volume</string>
     <string name="sound_custom">Custom sound</string>
     <string name="sound_category_bundled">Bundled Chimes — Pro unlocks all</string>
+    <string name="sound_category_bundled_pro">Bundled Chimes</string>
     <string name="sound_category_system">Phone Ringtones — Pro required</string>
+    <string name="sound_category_system_pro">Phone Ringtones</string>
     <string name="sound_category_recordings">My Recordings — 1 free, Pro for unlimited</string>
+    <string name="sound_category_recordings_pro">My Recordings</string>
     <string name="mode_clock">Clock Time</string>
     <string name="mode_countdown">Countdown</string>
     <string name="countdown_label">Remind me in</string>
