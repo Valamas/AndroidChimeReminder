@@ -17,7 +17,6 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.SimpleAdapter
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -413,47 +412,46 @@ class AddEditReminderFragment : Fragment() {
     // ── Sound picker ──────────────────────────────────────────────────────────
 
     private fun showSoundPicker() {
-        val data = listOf(
-            mapOf(
-                "title" to getString(R.string.sound_category_bundled),
-                "desc" to if (isPro) "" else getString(R.string.sound_category_bundled_desc)
-            ),
-            mapOf(
-                "title" to getString(R.string.sound_category_system),
-                "desc" to if (isPro) "" else getString(R.string.sound_category_system_desc)
-            ),
-            mapOf(
-                "title" to getString(R.string.sound_category_recordings),
-                "desc" to if (isPro) "" else getString(R.string.sound_category_recordings_desc)
-            )
-        )
+        val view = layoutInflater.inflate(R.layout.dialog_sound_picker, null)
+        val bundledBtn = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bundledButton)
+        val ringtoneBtn = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.ringtonButton)
+        val recordingBtn = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.recordingButton)
 
-        val adapter = SimpleAdapter(
-            requireContext(),
-            data,
-            R.layout.item_sound_category,
-            arrayOf("title", "desc"),
-            intArrayOf(android.R.id.text1, android.R.id.text2)
-        )
+        bundledBtn.text = getString(R.string.sound_category_bundled)
+        ringtoneBtn.text = getString(R.string.sound_category_system)
+        recordingBtn.text = getString(R.string.sound_category_recordings)
 
-        MaterialAlertDialogBuilder(requireContext())
+        if (!isPro) {
+            bundledBtn.text = bundledBtn.text.toString() + "\n" + getString(R.string.sound_category_bundled_desc)
+            ringtoneBtn.text = ringtoneBtn.text.toString() + "\n" + getString(R.string.sound_category_system_desc)
+            recordingBtn.text = recordingBtn.text.toString() + "\n" + getString(R.string.sound_category_recordings_desc)
+        }
+
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.choose_sound)
-            .setAdapter(adapter) { _, which ->
-                when (which) {
-                    0 -> showBundledChimePicker()
-                    1 -> if (isPro) ringtonePicker.launch(
-                        Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
-                            putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, false)
-                            putExtra(
-                                RingtoneManager.EXTRA_RINGTONE_TYPE,
-                                RingtoneManager.TYPE_ALARM or RingtoneManager.TYPE_NOTIFICATION
-                            )
-                        }
-                    ) else showSoundUpgradeDialog()
-                    2 -> showRecordingsPicker()
-                }
-            }
+            .setView(view)
             .show()
+
+        bundledBtn.setOnClickListener {
+            showBundledChimePicker()
+            dialog.dismiss()
+        }
+        ringtoneBtn.setOnClickListener {
+            if (isPro) ringtonePicker.launch(
+                Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
+                    putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, false)
+                    putExtra(
+                        RingtoneManager.EXTRA_RINGTONE_TYPE,
+                        RingtoneManager.TYPE_ALARM or RingtoneManager.TYPE_NOTIFICATION
+                    )
+                }
+            ) else showSoundUpgradeDialog()
+            dialog.dismiss()
+        }
+        recordingBtn.setOnClickListener {
+            showRecordingsPicker()
+            dialog.dismiss()
+        }
     }
 
     private fun showRecordingsPicker() {
