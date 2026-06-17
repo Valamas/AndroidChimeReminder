@@ -13,6 +13,7 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
+import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -55,6 +56,7 @@ class BillingManager private constructor(app: Application) : PurchasesUpdatedLis
     }
 
     fun launchPurchase(activity: Activity) {
+        Log.d("BillingManager", "launchPurchase called, billingClient.isReady=${billingClient.isReady}")
         val params = QueryProductDetailsParams.newBuilder()
             .setProductList(
                 listOf(
@@ -66,8 +68,17 @@ class BillingManager private constructor(app: Application) : PurchasesUpdatedLis
             ).build()
 
         billingClient.queryProductDetailsAsync(params) { result, productDetailsList ->
-            if (result.responseCode != BillingClient.BillingResponseCode.OK) return@queryProductDetailsAsync
-            val productDetails = productDetailsList.firstOrNull() ?: return@queryProductDetailsAsync
+            Log.d("BillingManager", "queryProductDetailsAsync result code=${result.responseCode}, products=${productDetailsList.size}")
+            if (result.responseCode != BillingClient.BillingResponseCode.OK) {
+                Log.e("BillingManager", "Query failed: ${result.debugMessage}")
+                return@queryProductDetailsAsync
+            }
+            val productDetails = productDetailsList.firstOrNull()
+            if (productDetails == null) {
+                Log.e("BillingManager", "Product not found in list")
+                return@queryProductDetailsAsync
+            }
+            Log.d("BillingManager", "Product found: ${productDetails.name}")
             val flowParams = BillingFlowParams.newBuilder()
                 .setProductDetailsParamsList(
                     listOf(
@@ -76,7 +87,8 @@ class BillingManager private constructor(app: Application) : PurchasesUpdatedLis
                             .build()
                     )
                 ).build()
-            billingClient.launchBillingFlow(activity, flowParams)
+            val launchResult = billingClient.launchBillingFlow(activity, flowParams)
+            Log.d("BillingManager", "launchBillingFlow result=${launchResult.responseCode}")
         }
     }
 
