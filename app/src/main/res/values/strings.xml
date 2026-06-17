@@ -100,7 +100,7 @@
     <string name="pro_banner_text">✨ 3 free reminders — Unlock Pro for unlimited</string>
     <string name="pro_upgrade_title">Upgrade to Pro</string>
     <string name="pro_upgrade_message">Free tier: up to 3 reminders and the Default chime.\n\nPro unlocks unlimited reminders, all chimes, and voice recordings — one-time purchase.</string>
-    <string name="pro_upgrade_button">Unlock Pro — $2.99</string>
+    <string name="pro_upgrade_button">Unlock Pro</string>
     <string name="pro_restore">Restore Purchase</string>
     <string name="pro_restore_checking">Checking purchases…</string>
 
