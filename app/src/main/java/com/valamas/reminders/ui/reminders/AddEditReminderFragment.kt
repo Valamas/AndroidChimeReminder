@@ -431,7 +431,7 @@ class AddEditReminderFragment : Fragment() {
         val adapter = SimpleAdapter(
             requireContext(),
             data,
-            android.R.layout.simple_list_item_2,
+            R.layout.item_sound_category,
             arrayOf("title", "desc"),
             intArrayOf(android.R.id.text1, android.R.id.text2)
         )
