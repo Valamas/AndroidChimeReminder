@@ -13,7 +13,10 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.text.Editable
+import android.text.SpannableString
 import android.text.TextWatcher
+import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -417,15 +420,9 @@ class AddEditReminderFragment : Fragment() {
         val ringtoneBtn = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.ringtonButton)
         val recordingBtn = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.recordingButton)
 
-        bundledBtn.text = getString(R.string.sound_category_bundled)
-        ringtoneBtn.text = getString(R.string.sound_category_system)
-        recordingBtn.text = getString(R.string.sound_category_recordings)
-
-        if (!isPro) {
-            bundledBtn.text = bundledBtn.text.toString() + "\n" + getString(R.string.sound_category_bundled_desc)
-            ringtoneBtn.text = ringtoneBtn.text.toString() + "\n" + getString(R.string.sound_category_system_desc)
-            recordingBtn.text = recordingBtn.text.toString() + "\n" + getString(R.string.sound_category_recordings_desc)
-        }
+        bundledBtn.text = formatButtonText(getString(R.string.sound_category_bundled), if (isPro) null else getString(R.string.sound_category_bundled_desc))
+        ringtoneBtn.text = formatButtonText(getString(R.string.sound_category_system), if (isPro) null else getString(R.string.sound_category_system_desc))
+        recordingBtn.text = formatButtonText(getString(R.string.sound_category_recordings), if (isPro) null else getString(R.string.sound_category_recordings_desc))
 
         val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.choose_sound)
@@ -744,6 +741,20 @@ class AddEditReminderFragment : Fragment() {
         }
     } catch (e: Exception) {
         null
+    }
+
+    private fun formatButtonText(title: String, subtitle: String?): SpannableString {
+        val text = if (subtitle != null) "$title\n$subtitle" else title
+        val span = SpannableString(text)
+
+        if (subtitle != null) {
+            val subtitleStart = title.length + 1
+            val subtitleColor = requireContext().getColor(android.R.color.darker_gray)
+            span.setSpan(RelativeSizeSpan(0.75f), subtitleStart, text.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+            span.setSpan(ForegroundColorSpan(subtitleColor), subtitleStart, text.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        return span
     }
 
     override fun onDestroyView() {
