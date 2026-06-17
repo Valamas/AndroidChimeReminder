@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
         android:textAlignment="textStart"
+        android:textAllCaps="false"
         app:cornerRadius="12dp"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
@@ -21,6 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
         android:textAlignment="textStart"
+        android:textAllCaps="false"
         app:cornerRadius="12dp"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
@@ -29,6 +31,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="textStart"
+        android:textAllCaps="false"
         app:cornerRadius="12dp"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
