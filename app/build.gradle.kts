@@ -7,14 +7,14 @@ plugins {
 
 android {
     namespace = "com.valamas.reminders"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.valamas.reminders"
-        minSdk = 21
-        targetSdk = 36
-        versionCode = 6
-        versionName = "1.0"
+        minSdk = 23
+        targetSdk = 35
+        versionCode = 7
+        versionName = "1.1"
     }
 
     buildTypes {
@@ -59,5 +59,5 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
-    implementation("com.android.billingclient:billing-ktx:9.0.0")
+    implementation("com.android.billingclient:billing-ktx:7.1.1")
 }
