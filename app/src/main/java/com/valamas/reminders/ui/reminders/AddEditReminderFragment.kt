@@ -76,7 +76,7 @@ class AddEditReminderFragment : Fragment() {
     private var _binding: FragmentAddEditReminderBinding? = null
     private val binding get() = _binding!!
     private val viewModel: RemindersViewModel by viewModels()
-    private val args: AddEditReminderFragmentArgs by navArgs()
+    private var reminderId: Long = -1L
     private var editingReminder: Reminder? = null
     private var selectedSoundUri: String = "raw:chime_ripple"
     private var selectedSoundLabel: String = "Default"
@@ -139,6 +139,8 @@ class AddEditReminderFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        reminderId = arguments?.getLong("reminderId") ?: -1L
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val navBar = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
@@ -204,12 +206,12 @@ class AddEditReminderFragment : Fragment() {
             }
         )
 
-        val isEditing = args.reminderId != -1L
+        val isEditing = reminderId != -1L
         (requireActivity() as AppCompatActivity).supportActionBar?.title =
             getString(if (isEditing) R.string.edit_reminder else R.string.add_reminder)
 
         if (isEditing) {
-            loadReminder(args.reminderId)
+            loadReminder(reminderId)
             binding.deleteButton.visibility = View.VISIBLE
             binding.deleteButton.setOnClickListener {
                 editingReminder?.let { r ->

@@ -68,27 +68,33 @@ class BillingManager private constructor(app: Application) : PurchasesUpdatedLis
             ).build()
 
         billingClient.queryProductDetailsAsync(params) { result, productDetailsList ->
-            Log.d("BillingManager", "queryProductDetailsAsync result code=${result.responseCode}, products=${productDetailsList.size}")
-            if (result.responseCode != BillingClient.BillingResponseCode.OK) {
-                Log.e("BillingManager", "Query failed: ${result.debugMessage}")
-                return@queryProductDetailsAsync
+            try {
+                Log.d("BillingManager", "queryProductDetailsAsync result code=${result.responseCode}")
+                if (result.responseCode != BillingClient.BillingResponseCode.OK) {
+                    Log.e("BillingManager", "Query failed: ${result.debugMessage}")
+                    return@queryProductDetailsAsync
+                }
+                @Suppress("UNCHECKED_CAST")
+                val list = productDetailsList as? List<Any>
+                if (list == null || list.isEmpty()) {
+                    Log.e("BillingManager", "Product not found in list")
+                    return@queryProductDetailsAsync
+                }
+                val productDetails = list[0]
+                Log.d("BillingManager", "Product found, launching billing flow")
+                val flowParams = BillingFlowParams.newBuilder()
+                    .setProductDetailsParamsList(
+                        listOf(
+                            BillingFlowParams.ProductDetailsParams.newBuilder()
+                                .setProductDetails(productDetails as com.android.billingclient.api.ProductDetails)
+                                .build()
+                        )
+                    ).build()
+                val launchResult = billingClient.launchBillingFlow(activity, flowParams)
+                Log.d("BillingManager", "launchBillingFlow result=${launchResult.responseCode}")
+            } catch (e: Exception) {
+                Log.e("BillingManager", "Error launching purchase: ${e.message}", e)
             }
-            val productDetails = productDetailsList.firstOrNull()
-            if (productDetails == null) {
-                Log.e("BillingManager", "Product not found in list")
-                return@queryProductDetailsAsync
-            }
-            Log.d("BillingManager", "Product found: ${productDetails.name}")
-            val flowParams = BillingFlowParams.newBuilder()
-                .setProductDetailsParamsList(
-                    listOf(
-                        BillingFlowParams.ProductDetailsParams.newBuilder()
-                            .setProductDetails(productDetails)
-                            .build()
-                    )
-                ).build()
-            val launchResult = billingClient.launchBillingFlow(activity, flowParams)
-            Log.d("BillingManager", "launchBillingFlow result=${launchResult.responseCode}")
         }
     }
 

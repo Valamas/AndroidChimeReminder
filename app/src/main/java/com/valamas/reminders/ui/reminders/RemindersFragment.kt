@@ -45,7 +45,8 @@ class RemindersFragment : Fragment() {
             onToggle = { reminder -> viewModel.toggleEnabled(reminder) },
             onClick = { reminder ->
                 findNavController().navigate(
-                    RemindersFragmentDirections.actionRemindersToAddEdit(reminder.id)
+                    R.id.addEditReminderFragment,
+                    Bundle().apply { putLong("reminderId", reminder.id) }
                 )
             },
             onLongClick = { reminder ->
@@ -72,7 +73,8 @@ class RemindersFragment : Fragment() {
                         showUpgradeDialog()
                     } else {
                         findNavController().navigate(
-                            RemindersFragmentDirections.actionRemindersToAddEdit(-1L)
+                            R.id.addEditReminderFragment,
+                            Bundle().apply { putLong("reminderId", -1L) }
                         )
                     }
                     return true

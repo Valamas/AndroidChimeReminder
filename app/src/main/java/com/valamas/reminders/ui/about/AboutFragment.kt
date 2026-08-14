@@ -1,7 +1,5 @@
 package com.valamas.reminders.ui.about
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.valamas.reminders.App
 import kotlinx.coroutines.launch
 import com.valamas.reminders.BuildConfig
@@ -35,7 +34,7 @@ class AboutFragment : Fragment() {
         binding.versionText.text = "Version ${BuildConfig.VERSION_NAME}"
 
         binding.privacyPolicyButton.setOnClickListener {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.privacy_policy_url))))
+            findNavController().navigate(R.id.action_about_to_privacyPolicy)
         }
 
         binding.restoreButton.setOnClickListener {
