@@ -67,26 +67,25 @@ class BillingManager private constructor(app: Application) : PurchasesUpdatedLis
                 )
             ).build()
 
-        billingClient.queryProductDetailsAsync(params) { result, productDetailsList ->
+        billingClient.queryProductDetailsAsync(params) { result, productDetailsResult ->
             try {
                 Log.d("BillingManager", "queryProductDetailsAsync result code=${result.responseCode}")
                 if (result.responseCode != BillingClient.BillingResponseCode.OK) {
                     Log.e("BillingManager", "Query failed: ${result.debugMessage}")
                     return@queryProductDetailsAsync
                 }
-                @Suppress("UNCHECKED_CAST")
-                val list = productDetailsList as? List<Any>
-                if (list == null || list.isEmpty()) {
+                val productDetailsList = productDetailsResult.productDetailsList
+                if (productDetailsList == null || productDetailsList.isEmpty()) {
                     Log.e("BillingManager", "Product not found in list")
                     return@queryProductDetailsAsync
                 }
-                val productDetails = list[0]
+                val productDetails = productDetailsList[0]
                 Log.d("BillingManager", "Product found, launching billing flow")
                 val flowParams = BillingFlowParams.newBuilder()
                     .setProductDetailsParamsList(
                         listOf(
                             BillingFlowParams.ProductDetailsParams.newBuilder()
-                                .setProductDetails(productDetails as com.android.billingclient.api.ProductDetails)
+                                .setProductDetails(productDetails)
                                 .build()
                         )
                     ).build()
