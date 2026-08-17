@@ -11,8 +11,8 @@ android {
         applicationId = "com.valamas.reminders"
         minSdk = 23
         targetSdk = 36
-        versionCode = 9
-        versionName = "1.3"
+        versionCode = 10
+        versionName = "1.4"
     }
 
     buildTypes {
