@@ -17,7 +17,6 @@ import com.valamas.reminders.R
 import com.valamas.reminders.data.AppDatabase
 import com.valamas.reminders.data.Reminder
 import com.valamas.reminders.data.ReminderLog
-import com.valamas.reminders.data.RepeatType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -64,8 +63,6 @@ class ChimeService : Service() {
                 playNext()
                 return@launch
             }
-            // Reschedule BEFORE playing — if service crashes, alarm is already rescheduled
-            rescheduleAfterFire(db, reminder)
             // Log the trigger
             db.reminderLogDao().insert(
                 ReminderLog(reminderId = reminder.id, label = reminder.label)
@@ -141,20 +138,6 @@ class ChimeService : Service() {
         playNext()
     }
 
-    private suspend fun rescheduleAfterFire(db: AppDatabase, reminder: Reminder) {
-        when (reminder.repeatType) {
-            RepeatType.ONE_TIME -> {
-                // Keep nextTriggerMs so the item stays in its sorted position in the list
-                db.reminderDao().update(reminder.copy(isEnabled = false))
-            }
-            RepeatType.DAILY, RepeatType.CUSTOM_DAYS -> {
-                val next = AlarmScheduler.computeNextTrigger(reminder)
-                val updated = reminder.copy(nextTriggerMs = next)
-                db.reminderDao().update(updated)
-                AlarmScheduler.schedule(this@ChimeService, updated)
-            }
-        }
-    }
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= 26) {
