@@ -25,7 +25,7 @@ class PrivacyPolicyFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.webView.loadUrl("https://valamas.github.io/RemindersByValamas/")
+        binding.webView.loadUrl("https://valamas.github.io/AndroidChimeReminder/")
     }
 
     override fun onDestroyView() {
